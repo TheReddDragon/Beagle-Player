@@ -224,7 +224,15 @@ namespace Music_Player_WPF
                 nowPlaying_Art.Source = UsefulFunctions.GetAlbumArt(tfile);
                 nowPlaying_Title.Text = tfile.Tag.Title;
                 nowPlaying_Album.Text = tfile.Tag.Album;
-                nowPlaying_Artist.Text = tfile.Tag.Artists[0];
+                //check if it has an artist, if not (this is extremely hacky btw) set to unknown artist
+                try 
+                {
+                    nowPlaying_Artist.Text = tfile.Tag.Artists[0];
+                }
+                catch (System.IndexOutOfRangeException)
+                {
+                    nowPlaying_Artist.Text = "Unknown Artist";
+                }
             }
         }
 
