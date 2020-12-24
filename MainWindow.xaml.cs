@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+//allows us to use debug.printline
+using System.Diagnostics;
 
 using TagLib;
 
@@ -69,19 +71,20 @@ namespace Music_Player_WPF
 
             StyleControls();
 
-            //Make options thingy
-            Console.WriteLine("Begin file search");
+            //make options thingy
+            Debug.WriteLine("Begin file search");
             string current_directory = Directory.GetCurrentDirectory();
             string[] files = Directory.GetFiles(current_directory);
             for( int i = 0; i < files.Length; i++ )
             {
                 string file_name = files[i].Substring(current_directory.Length + 1);
-                Console.WriteLine(file_name);
+                Debug.WriteLine(file_name);
                 if( file_name == "config.txt" )
                 {
-                    Console.WriteLine("Found config file");
+                    Debug.WriteLine("Found config file");
                     string config_text = @System.IO.File.ReadAllText(files[i]);
                     GetSongsFromPath(config_text);
+                    Debug.WriteLine(config_text);
                     string[] s = Directory.GetFiles(config_text);
                     break;
                 }
@@ -205,7 +208,7 @@ namespace Music_Player_WPF
             margin.Top = 0;
             margin.Bottom = 0;
             controlPanelButtonGroup.Margin = margin;
-            Console.WriteLine("Left Margin:" + play_image_x);
+            Debug.WriteLine("Left Margin:" + play_image_x);
 
             playbackBar.Width = control_panel_width - 20;
             playbackBar.Height = 5;
@@ -234,17 +237,42 @@ namespace Music_Player_WPF
                 playlistListView.Items.Add(i);
 
                 var tfile = TagLib.File.Create(i.path);
-                nowPlaying_Art.Source = UsefulFunctions.GetAlbumArt(tfile);
-                nowPlaying_Title.Text = tfile.Tag.Title;
-                nowPlaying_Album.Text = tfile.Tag.Album;
-                //check if it has an artist, if not (this is extremely hacky btw) set to unknown artist
-                try 
+                //store the title as for processing in a conditional --tom
+                var songTitle = tfile.Tag.Title;
+                //store the album art for processing in a conditional --tom
+                var nowPlaying_Art_Data = UsefulFunctions.GetAlbumArt(tfile);
+                //store the album name for processing in a conditional --tom
+                var songArtist = tfile.Tag.Performers;
+                //if the album has no art set it to the header image --tom
+                if (nowPlaying_Art_Data == null)
                 {
-                    nowPlaying_Artist.Text = tfile.Tag.Artists[0];
+                    nowPlaying_Art.Source = MyConstants.HeaderImage;
                 }
-                catch (System.IndexOutOfRangeException)
+                else
+                {
+                    nowPlaying_Art.Source = nowPlaying_Art_Data;
+                }
+                //check if the file has an actual title, if not set to file name
+                
+                if (songTitle == null)
+                {
+                    nowPlaying_Title.Text = "(No Title)";
+                }
+                else
+                {
+                    nowPlaying_Title.Text = songTitle;
+                }
+                //check if the file is part of an album, if not set to Unknown Album
+
+                nowPlaying_Album.Text = tfile.Tag.Album;
+                //check if it has an artist or artists, if not set to unknown artist
+                if (songArtist.Length == 0)
                 {
                     nowPlaying_Artist.Text = "Unknown Artist";
+                }
+                else
+                {
+                    nowPlaying_Artist.Text = tfile.Tag.JoinedPerformers;
                 }
             }
         }
@@ -266,7 +294,7 @@ namespace Music_Player_WPF
 
         private void Window_SizeChanged(object sender, System.EventArgs e)
         {
-            Console.WriteLine("Size Changed");
+            Debug.WriteLine("Size Changed");
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
