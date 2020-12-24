@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+//allows us to use debug.printline
+using System.Diagnostics;
 
 using TagLib;
 
@@ -81,23 +83,23 @@ namespace Music_Player_WPF
 
             headerImage.Source = MyConstants.HeaderImage;
 
-            Console.WriteLine("Begin file search");
+            Debug.WriteLine("Begin file search");
             string current_directory = Directory.GetCurrentDirectory();
             string[] files = Directory.GetFiles(current_directory);
             for( int i = 0; i < files.Length; i++ )
             {
                 string file_name = files[i].Substring(current_directory.Length + 1);
-                Console.WriteLine(file_name);
+                Debug.WriteLine(file_name);
                 if( file_name == "config.txt" )
                 {
-                    Console.WriteLine("Found config file");
+                    Debug.WriteLine("Found config file");
                     string config_text = @System.IO.File.ReadAllText(files[i]);
                     GetSongsFromPath(config_text);
-                    Console.WriteLine(config_text);
+                    Debug.WriteLine(config_text);
                     string[] s = Directory.GetFiles(config_text);
                     for( int j = 0; j < s.Length; j++ )
                     {
-                        Console.WriteLine(s[j]);
+                        Debug.WriteLine(s[j]);
                     }
                     break;
                 }
@@ -192,7 +194,7 @@ namespace Music_Player_WPF
             margin.Top = 0;
             margin.Bottom = 0;
             controlPanelButtonGroup.Margin = margin;
-            Console.WriteLine("Left Margin:" + play_image_x);
+            Debug.WriteLine("Left Margin:" + play_image_x);
 
             playbackBar.Width = control_panel_width - 20;
             playbackBar.Height = 5;
@@ -222,6 +224,7 @@ namespace Music_Player_WPF
 
                 var tfile = TagLib.File.Create(i.path);
                 nowPlaying_Art.Source = UsefulFunctions.GetAlbumArt(tfile);
+                Debug.WriteLine(nowPlaying_Art.Source);
                 nowPlaying_Title.Text = tfile.Tag.Title;
                 nowPlaying_Album.Text = tfile.Tag.Album;
                 //check if it has an artist, if not (this is extremely hacky btw) set to unknown artist
@@ -253,7 +256,7 @@ namespace Music_Player_WPF
 
         private void Window_SizeChanged(object sender, System.EventArgs e)
         {
-            Console.WriteLine("Size Changed");
+            Debug.WriteLine("Size Changed");
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -280,7 +283,7 @@ namespace Music_Player_WPF
                     int seconds = (int)(total_seconds - (minutes * 60));
                     string time_string = minutes.ToString("00") + ":" + seconds.ToString("00");
                     control_Timestamp.Text = time_string + "/" + AudioPlayer.currentLength;
-                    //Console.WriteLine(timestamp.Text);
+                    //Debug.WriteLine(timestamp.Text);
                 }
             }
         }
