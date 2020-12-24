@@ -223,18 +223,42 @@ namespace Music_Player_WPF
                 playlistListView.Items.Add(i);
 
                 var tfile = TagLib.File.Create(i.path);
-                nowPlaying_Art.Source = UsefulFunctions.GetAlbumArt(tfile);
-                Debug.WriteLine(nowPlaying_Art.Source);
-                nowPlaying_Title.Text = tfile.Tag.Title;
-                nowPlaying_Album.Text = tfile.Tag.Album;
-                //check if it has an artist, if not (this is extremely hacky btw) set to unknown artist
-                try 
+                //store the title as for processing in a conditional --tom
+                var songTitle = tfile.Tag.Title;
+                //store the album art for processing in a conditional --tom
+                var nowPlaying_Art_Data = UsefulFunctions.GetAlbumArt(tfile);
+                //store the album name for processing in a conditional --tom
+                var songArtist = tfile.Tag.Performers;
+                //if the album has no art set it to the header image --tom
+                if (nowPlaying_Art_Data == null)
                 {
-                    nowPlaying_Artist.Text = tfile.Tag.Artists[0];
+                    nowPlaying_Art.Source = MyConstants.HeaderImage;
                 }
-                catch (System.IndexOutOfRangeException)
+                else
+                {
+                    nowPlaying_Art.Source = nowPlaying_Art_Data;
+                }
+                //check if the file has an actual title, if not set to file name
+                
+                if (songTitle == null)
+                {
+                    nowPlaying_Title.Text = "(No Title)";
+                }
+                else
+                {
+                    nowPlaying_Title.Text = songTitle;
+                }
+                //check if the file is part of an album, if not set to Unknown Album
+
+                nowPlaying_Album.Text = tfile.Tag.Album;
+                //check if it has an artist or artists, if not set to unknown artist
+                if (songArtist.Length == 0)
                 {
                     nowPlaying_Artist.Text = "Unknown Artist";
+                }
+                else
+                {
+                    nowPlaying_Artist.Text = tfile.Tag.JoinedPerformers;
                 }
             }
         }
