@@ -131,5 +131,8 @@
     <Resource Include="images\reverse_Idle_Icon.png" />
     <Resource Include="images\reverse_Pressed_Icon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="config.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
