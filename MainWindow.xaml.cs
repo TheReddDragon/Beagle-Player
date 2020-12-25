@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+//allows us to use debug.printline
+using System.Diagnostics;
 
 using TagLib;
 
@@ -66,17 +68,26 @@ namespace Music_Player_WPF
             MainGrid.Arrange(new Rect(0, 0, MainGrid.DesiredSize.Width, MainGrid.DesiredSize.Height));
 
             playlist = new List<SongData>();
-            
-            //Make options thingy
+
+
+            StyleControls();
+
+            //make options thingy
+            Debug.WriteLine("Begin file search");
             string current_directory = Directory.GetCurrentDirectory();
             string[] files = Directory.GetFiles(current_directory);
             for( int i = 0; i < files.Length; i++ )
             {
                 string file_name = files[i].Substring(current_directory.Length + 1);
+
+                Debug.WriteLine(file_name);
                 if( file_name == "config.txt" )
                 {
+                    Debug.WriteLine("Found config file");
                     string config_text = @System.IO.File.ReadAllText(files[i]);
                     GetSongsFromPath(config_text);
+                    Debug.WriteLine(config_text);
+                    string[] s = Directory.GetFiles(config_text);
                     break;
                 }
             }
@@ -192,7 +203,6 @@ namespace Music_Player_WPF
         {
             e.CanExecute = true;
         }
-
         private void PanelTest_MouseEnter(object sender, MouseEventArgs e)
         {
             var item = (sender as ListView).SelectedItem;
@@ -211,6 +221,7 @@ namespace Music_Player_WPF
                 nowPlaying_Title.Text = i.Title;
                 nowPlaying_Album.Text = i.AlbumName; 
                 nowPlaying_Artist.Text = i.Artist;
+
             }
         }
 
@@ -231,7 +242,7 @@ namespace Music_Player_WPF
 
         private void Window_SizeChanged(object sender, System.EventArgs e)
         {
-            Console.WriteLine("Size Changed");
+            Debug.WriteLine("Size Changed");
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
